@@ -1,0 +1,19 @@
+# 依赖与本地环境
+node_modules/
+
+# 编辑器/系统
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# 日志与临时文件
+*.log
+.tmp/
+*.tmp
+
+# 覆盖率
+coverage/
+
+# 注意：lib/ 是构建产物，故意提交。
+# /plugin install / github: 安装直接使用 lib/types/index.js，不要求在用户机器上构建。

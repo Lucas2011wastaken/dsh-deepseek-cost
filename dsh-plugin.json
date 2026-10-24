@@ -1,0 +1,33 @@
+{
+  "$schema": "urn:dsh-std:community-draft:dsh-plugin:0.15",
+  "manifestVersion": "0.15",
+  "id": "dsh-deepseek-cost",
+  "name": "dsh-deepseek-cost",
+  "version": "0.5.0",
+  "license": "MIT",
+  "facets": {
+    "host": {
+      "entry": "lib/types/index.js",
+      "apiVersion": "v1alpha1"
+    }
+  },
+  "requires": {
+    "contracts": [
+      {
+        "apiVersion": "storage.dsh/v1alpha1",
+        "kind": "LocalStorage"
+      }
+    ]
+  },
+  "permissions": [
+    {
+      "name": "storage.local.read",
+      "scope": "dsh-deepseek-cost",
+      "reason": "读取旧版累计台账，用于一次性迁移到多实例共享事件日志"
+    }
+  ],
+  "contributes": {
+    "commands": []
+  },
+  "subscriptions": []
+}

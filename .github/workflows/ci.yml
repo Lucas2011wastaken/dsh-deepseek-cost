@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    name: Unit tests (no host required)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run pure unit tests
+        run: npm run test:unit
+      - name: Runtime import smoke
+        run: node --input-type=module -e "await import('./lib/types/index.js'); console.log('runtime import ok')"
+      - name: Validate manifest JSON
+        run: node -e "JSON.parse(require('node:fs').readFileSync('dsh-plugin.json', 'utf8')); console.log('manifest ok')"
+
+  # 宿主集成测试（test/plugin.test.mjs）需要本机安装的 @deepseek-ai/cordis 与
+  # dsh-tui 类型/运行时，CI 里没有这些包，所以在本地跑：
+  #   sh scripts/link-deps.sh
+  #   npm run test:host
+  #   npm run smoke:host

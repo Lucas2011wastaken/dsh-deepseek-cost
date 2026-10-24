@@ -1,0 +1,54 @@
+# dsh-deepseek-cost —— bundle patch
+#
+# 由 package.json 的 `dsh.bundle.patch` 引用。通过 `/plugin install` 或
+# `dsh plugin add github:<owner>/<repo>` 安装时，Loader 会从 profile 的
+# node_modules 解析下面这个包名。
+#
+# 如果要用 `--patch` 直挂源码（不经过安装），把 name 改成：
+#   file:///absolute/path/to/dsh-deepseek-cost/lib/types/index.js
+- insert:
+    - id: deepseek-cost
+      name: dsh-deepseek-cost
+      config:
+        enabled: true
+        providers:
+          - ollama-pro
+        status:
+          enabled: true
+          # auto：宿主有 tuiStatus.setField 就写底栏字段，没有就回退状态行
+          placement: auto
+          slot: left-tail
+          tone: dim
+          maxCells: 28
+          detail: true
+          click: true
+          label: DS官价
+          showWindow: true
+        panel:
+          enabled: true
+          title: DS 官价台账
+          # 必须恰好 1 cell；宽字形（emoji/汉字）会被降级成无图标
+          icon: ◈
+        storage:
+          enabled: true
+          # 每进程一个 append-only JSONL；多开 TUI 靠它汇总
+          dir: ~/.dsh-tui/deepseek-cost
+          refreshMs: 10000
+          keepDays: 45
+        quota:
+          enabled: true
+          # 依次尝试 env 与 ~/.dsh/.credentials.yaml 里的 refs.<NAME>
+          apiKeyEnv:
+            - OLLAMA_PRO_API_KEY
+            - OLLAMA_API_KEY
+          credentialsFile: ~/.dsh/.credentials.yaml
+          baseUrl: https://ollama.com
+          # 官方限流 10 次/分钟，60s 一次；多开用共享缓存 + 租约
+          pollMs: 60000
+          timeoutMs: 8000
+        billing:
+          # 老套餐的 /api/balance 没有 monthly period；填自己的订阅续费日，
+          # 「本月」就会对齐付费月而不是自然月。
+          # 例：2026-09-15T09:30:00+08:00；留空 = 自然月，面板会标注。
+          anchor: ''
+          timezone: Asia/Shanghai

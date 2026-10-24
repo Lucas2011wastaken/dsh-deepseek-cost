@@ -1,0 +1,70 @@
+{
+  "name": "dsh-deepseek-cost",
+  "version": "0.5.0",
+  "private": true,
+  "description": "在 dsh-tui 底栏字段与侧栏台账里，用 DeepSeek 官方计价系统给 ollama-pro 的 DeepSeek 模型记账（峰谷双价 · 缓存命中/未命中 · 人民币口径 · hover 明细），并展示 Ollama Cloud 的 5h/周/付费月配额；多开 TUI 共享台账",
+  "type": "module",
+  "license": "MIT",
+  "author": "Lucas2011wastaken",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-tui",
+    "deepseek",
+    "ollama",
+    "token-cost",
+    "tui"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucas2011wastaken/dsh-deepseek-cost.git"
+  },
+  "homepage": "https://github.com/Lucas2011wastaken/dsh-deepseek-cost#readme",
+  "bugs": {
+    "url": "https://github.com/Lucas2011wastaken/dsh-deepseek-cost/issues"
+  },
+  "main": "lib/types/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/types/index.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "scripts",
+    "cordis.patch.yml",
+    "dsh-plugin.json",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": "^22.19 || >=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.mjs",
+    "test:unit": "node --test test/pricing.test.mjs test/ledger.test.mjs test/render.test.mjs test/events.test.mjs test/quota.test.mjs test/ranges.test.mjs",
+    "test:host": "node --test test/plugin.test.mjs",
+    "smoke:host": "node scripts/smoke-host.mjs",
+    "link-deps": "sh scripts/link-deps.sh"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  }
+}
