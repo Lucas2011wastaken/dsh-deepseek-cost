@@ -485,6 +485,21 @@ test('配额面板：legacy 5h/周剩余量与重置时间', async () => {
   }
 })
 
+test('billing-anchor 文件：不改 profile 也能对齐付费月', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'dsh-cost-anchor-plugin-'))
+  try {
+    await writeFile(join(dir, 'billing-anchor'), '2026-09-15T09:30:00+08:00\n')
+    const { root, captured } = await mount({ dir })
+    const tree = captured.panel.component(panelProps(60))
+    const text = flatten(tree).join('\n')
+    assert.match(text, /月=付费月/)
+    assert.doesNotMatch(text, /付费月未配置/)
+    await root.stop?.()
+  } finally {
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
 test('卸载时撤下状态行与面板（ctx.effect 清理）', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'dsh-cost-unload-'))
   const root = new Context()

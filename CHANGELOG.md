@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1 — 2026-10-24
+
+- 付费月锚点支持本地文件覆盖：`<storage.dir>/billing-anchor`（一行 ISO 时间）。
+  不需要手改 profile 的 `cordis.patch.yml`；配置里的非空 `billing.anchor` 优先。
+- 卸载插件时不会留下 profile 补丁残片；锚点文件和台账一样属于用户数据，
+  彻底清理删 `~/.dsh-tui/deepseek-cost/` 即可。
+
 ## 0.5.0 — 2026-10-24
 
 - 多 TUI 实例：台账改为每进程一个 append-only JSONL（`storage.dir/instances/`），

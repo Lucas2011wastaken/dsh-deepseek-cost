@@ -27,6 +27,7 @@ import type {} from '@deepseek-ai/dsh-session'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Config, deepseekPeakRule, DEFAULT_PANEL_ID, DEFAULT_STATUS_KEY, resolveConfig } from './config.js'
+import { readBillingAnchorFile } from './billing.js'
 import { expandHome, migrateLegacyDoc, UsageLog, type UsageEvent } from './events.js'
 import { addSlots, normalizeDoc, summarize, ZERO_SLOTS, type DayLedger, type LedgerDoc, type MoneySummary } from './ledger.js'
 import { isPeak, type CostSlots, type TokenCounts } from './pricing.js'
@@ -143,6 +144,12 @@ export function apply(ctx: Context, rawConfig: unknown = {}): void {
   const dsRule = deepseekPeakRule(config)
   const storageDir = expandHome(config.storage.dir)
   const legacyFile = join(storageDir, 'ledger.json')
+  // 付费月锚点：config 非空优先；否则读 <storage.dir>/billing-anchor，
+  // 让用户不必改 profile 的 cordis.patch.yml。
+  const billingAnchorText = config.billing.anchor.trim() !== ''
+    ? config.billing.anchor
+    : readBillingAnchorFile(storageDir)
+  const billingAnchorMs = parseAnchor(billingAnchorText)
 
   // 服务在 apply 时还不存在，所以用 inject 捕获；迁移时再尝试读旧台账。
   let storageService: TuiPluginStorageLike | undefined
@@ -258,7 +265,7 @@ export function apply(ctx: Context, rawConfig: unknown = {}): void {
     ensureInitialized()
     const nowMs = Date.now()
     const quotaSnapshot = quota.getSnapshot()
-    const rangeSet = buildRangeSet(nowMs, quotaSnapshot, parseAnchor(config.billing.anchor))
+    const rangeSet = buildRangeSet(nowMs, quotaSnapshot, billingAnchorMs)
     const ranges: PanelRangeView[] = [
       { id: 'today', label: '今日', summary: log.summaryOfWindow(rangeSet.today.from, rangeSet.today.to), from: rangeSet.today.from, to: rangeSet.today.to, note: rangeSet.today.note },
       { id: 'week', label: '本周', summary: log.summaryOfWindow(rangeSet.week.from, rangeSet.week.to), from: rangeSet.week.from, to: rangeSet.week.to, note: rangeSet.week.note },

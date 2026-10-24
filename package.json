@@ -1,6 +1,6 @@
 {
   "name": "dsh-deepseek-cost",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "在 dsh-tui 底栏字段与侧栏台账里，用 DeepSeek 官方计价系统给 ollama-pro 的 DeepSeek 模型记账（峰谷双价 · 缓存命中/未命中 · 人民币口径 · hover 明细），并展示 Ollama Cloud 的 5h/周/付费月配额；多开 TUI 共享台账",
   "type": "module",
@@ -48,7 +48,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --test test/*.test.mjs",
-    "test:unit": "node --test test/pricing.test.mjs test/ledger.test.mjs test/render.test.mjs test/events.test.mjs test/quota.test.mjs test/ranges.test.mjs",
+    "test:unit": "node --test test/billing.test.mjs test/pricing.test.mjs test/ledger.test.mjs test/render.test.mjs test/events.test.mjs test/quota.test.mjs test/ranges.test.mjs",
     "test:host": "node --test test/plugin.test.mjs",
     "smoke:host": "node scripts/smoke-host.mjs",
     "link-deps": "sh scripts/link-deps.sh"

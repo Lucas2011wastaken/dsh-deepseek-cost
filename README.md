@@ -10,6 +10,9 @@ dsh-tui 的**底栏字段**（提示框下方那行，紧跟内建 model/token/c
 
 ## 0.5.0 改了什么
 
+> 0.5.1：付费月锚点可以放在 `<storage.dir>/billing-anchor`（一行 ISO），不必手改
+> profile；卸载不会在 profile 里留下补丁。
+
 - **多开 TUI 终于能统计了**：台账从「整份 JSON 读改写」换成**每进程一个
   append-only JSONL**，启动/定时增量合并其他实例的文件；两个 TUI 同时记账不会
   再互相覆盖。
@@ -125,6 +128,15 @@ dsh-tui 的**底栏字段**（提示框下方那行，紧跟内建 model/token/c
 老套餐的 `/api/balance` 没有 monthly `period`；`billing.anchor` 不填时，面板会显示
 `月=自然月` 并附一行 `付费月未配置 · billing.anchor`，提醒你去配置订阅续费日。
 
+不想手改 profile？把一行 ISO 时间写到：
+
+```sh
+echo '2026-09-15T09:30:00+08:00' > ~/.dsh-tui/deepseek-cost/billing-anchor
+```
+
+插件在 `billing.anchor` 为空时会读这个文件（配置非空优先）。这属于用户数据，
+卸载插件后不会被 `/plugin remove` 删除，想彻底清理直接删 `~/.dsh-tui/deepseek-cost/`。
+
 ## 为什么没有命中率
 
 内置底栏的 `缓存 xx%` 用的是 `channel.lastUsage`，即**主会话最后一次请求**；
@@ -163,7 +175,7 @@ dsh-tui 的**底栏字段**（提示框下方那行，紧跟内建 model/token/c
 | `quota.baseUrl` | `https://ollama.com` | 配额接口根地址 |
 | `quota.pollMs` | `60000` | 轮询间隔（夹到 30s…600s） |
 | `quota.timeoutMs` | `8000` | 单次请求超时 |
-| `billing.anchor` | `''` | 老套餐付费月锚点，ISO 8601，例如 `2026-09-15T09:30:00+08:00`；留空 = 自然月 |
+| `billing.anchor` | `''` | 老套餐付费月锚点，ISO 8601，例如 `2026-09-15T09:30:00+08:00`；也可用 `<storage.dir>/billing-anchor`（一行 ISO）；配置非空优先；留空 = 自然月 |
 | `billing.timezone` | `Asia/Shanghai` | 当前实现按固定 UTC+8 计算，保留此键用于文档 |
 | `holidays` | `[]`（用内置 2026 表） | 覆盖中国法定节假日表 |
 | `debug` | `false` | 打印完整解析后配置到日志（不含凭据） |
@@ -229,6 +241,23 @@ name: 'file:///absolute/path/to/dsh-deepseek-cost/lib/types/index.js'
 ├── LICENSE
 └── .github/workflows/ci.yml # 纯函数测试 + 运行时 import 冒烟
 ```
+
+## 卸载
+
+`/plugin remove dsh-deepseek-cost` 会移除 bundle/行，但**不会删除用户数据**：
+
+- `~/.dsh-tui/deepseek-cost/`：事件台账、配额缓存、`billing-anchor`（如果有）；
+- `~/.dsh-tui/plugin-storage/dsh-deepseek-cost.json`：旧版 `ledger:v1`（迁移用）。
+
+想彻底清理：
+
+```sh
+rm -rf ~/.dsh-tui/deepseek-cost
+rm -f  ~/.dsh-tui/plugin-storage/dsh-deepseek-cost.json
+```
+
+因为付费月锚点放在用户数据目录（或插件 config），**不会**在 profile 的
+`cordis.patch.yml` 里留下一个指向已卸载行的补丁。
 
 ## 兼容性（对照 dsh-tui 0.17.0）
 
